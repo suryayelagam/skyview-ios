@@ -6,19 +6,21 @@ import SwiftUI
 
 @main
 struct DashApp: App {
+    @StateObject private var motion = MotionBridge()
     var body: some Scene {
-        WindowGroup { RootView() }
+        WindowGroup { RootView().environmentObject(motion).onAppear { motion.start() } }
     }
 }
 
 struct RootView: View {
     @AppStorage("haURL") private var haURL = "http://homeassistant.local:8123"
-    @StateObject private var motion = MotionBridge()
+    @EnvironmentObject private var motion: MotionBridge
 
     var body: some View {
         TabView {
             WebTab(urlString: haURL, motion: motion)
                 .tabItem { Label("Home", systemImage: "house.fill") }
+                .onAppear { motion.start() }
             WebTab(urlString: haURL + "/local/skyview/flights.html", motion: motion)
                 .tabItem { Label("Sky", systemImage: "airplane") }
             TasksView()
